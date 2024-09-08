@@ -4,7 +4,14 @@ import { basicAuth } from "hono/basic-auth";
 import { bearerAuth } from "hono/bearer-auth";
 import api from "./api.ts";
 
-const app = new OpenAPIHono();
+export type Env = {
+  Variables: {
+    kv: Deno.Kv;
+  };
+};
+
+const app = new OpenAPIHono<Env>();
+const kv = await Deno.openKv("./sample.db");
 
 // apply Middleware
 app
@@ -26,7 +33,11 @@ app
       username: "user",
       password: "password",
     }),
-  );
+  )
+  .use(async (c, next) => {
+    c.set("kv", kv);
+    await next();
+  });
 
 app.route("/api", api);
 

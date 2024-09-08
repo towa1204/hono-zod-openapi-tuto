@@ -6,7 +6,7 @@
     "@hono/swagger-ui": "npm:@hono/swagger-ui"
   },
   "tasks": {
-    "start": "deno run --allow-net main.ts"
+    "start": "deno run -A --unstable-kv main.ts"
   },
   "compilerOptions": {
     "jsx": "precompile",
