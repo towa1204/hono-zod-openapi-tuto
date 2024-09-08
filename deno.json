@@ -6,7 +6,8 @@
     "@hono/swagger-ui": "npm:@hono/swagger-ui"
   },
   "tasks": {
-    "start": "deno run -A --unstable-kv main.ts"
+    "start": "deno run -A --env --unstable-kv main.ts",
+    "start-dev": "deno run -A --env=.env.dev --unstable-kv main.ts"
   },
   "compilerOptions": {
     "jsx": "precompile",

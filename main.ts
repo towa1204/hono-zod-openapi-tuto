@@ -3,35 +3,33 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { basicAuth } from "hono/basic-auth";
 import { bearerAuth } from "hono/bearer-auth";
 import api from "./api.ts";
+import { Env, getEnvObject } from "./env.ts";
 
-export type Env = {
-  Variables: {
-    kv: Deno.Kv;
-  };
-};
-
+const env = getEnvObject();
+const kv = env.kvPath != undefined
+  ? await Deno.openKv(env.kvPath)
+  : await Deno.openKv();
 const app = new OpenAPIHono<Env>();
-const kv = await Deno.openKv("./sample.db");
 
 // apply Middleware
 app
   .use(
     "/doc",
     bearerAuth({
-      token: "bearer-token",
+      token: env.bearer.token,
     }),
   )
   .use(
     "/api/*",
     bearerAuth({
-      token: "bearer-token",
+      token: env.bearer.token,
     }),
   )
   .use(
     "/ui",
     basicAuth({
-      username: "user",
-      password: "password",
+      username: env.basic.user,
+      password: env.basic.passwd,
     }),
   )
   .use(async (c, next) => {
@@ -57,7 +55,7 @@ app
       requestInterceptor: `
       request => {
         if (request.url === '/doc') {
-          request.headers['authorization'] = \`Bearer bearer-token\`;
+          request.headers['authorization'] = \`Bearer ${env.bearer.token}\`;
         }
         return request;
       }`,
